@@ -6,8 +6,10 @@ gtklflags=`pkg-config  --libs gtk+-2.0`
 x11lflags=-lx11
 
 #objects=main.o gtk_preserve_window.o functions.o
-sources= main.cc gtk_preserve_window.cc functions.cc gtk_plugin_container.cc
-objs = main.o gtk_preserve_window.o functions.o gtk_plugin_container.o
+sources= main.cc gtk_preserve_window.cc functions.cc \
+  gtk_plugin_container.cc xlib_container.cc
+objs = main.o gtk_preserve_window.o functions.o \
+  gtk_plugin_container.o xlib_container.o
 
 cc = g++
 
