@@ -8,7 +8,7 @@ class RAIIResource {
 
 
 
-void configure_callback(GtkWindow *window, 
+static void configure_callback(GtkWindow *window, 
       GdkEvent *event, gpointer data) {
           
    int x, y;
@@ -27,7 +27,7 @@ void configure_callback(GtkWindow *window,
    g_string_free(buf, TRUE);
 }
 
-void TestContainer()
+static void TestContainer()
 {
 
 
@@ -35,7 +35,7 @@ void TestContainer()
 }
 
 
-void preserveRealize() {
+static void preserveRealize() {
 
 
 }
