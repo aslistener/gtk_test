@@ -10,7 +10,7 @@
  *   ./xlib_container mplayer video.mp4 -wid
  */
 
-#include "functions.h"
+#include "x11_test.h"
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>

@@ -1,1 +1,17 @@
+.vscode
+.vscode/*
 main
+/build/
+*.pyc
+out
+.vscode
+.cproject
+.project
+.settings/
+GPATH
+GRTAGS
+GTAGS
+tags
+gtk_test/main
+gtk_test/.vscode
+

@@ -1,17 +1,29 @@
 #pragma once
+#define GDK_PIXBUF_ENABLE_BACKEND
+
 
 #include "gtk_preserve_window.h"
 #include "gtk_plugin_container.h"
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <gdk/gdkx.h>
+#include <gdk-pixbuf/gdk-pixbuf.h>
+#include <gdk-pixbuf-xlib/gdk-pixbuf-xlib.h>
+#include <jpeglib.h>
+#include <signal.h>
+
 #include <assert.h>
 #include <chrono>
 #include <thread>
 
 #include <iostream>
 
+
+
 using namespace std;
+
+#define PRINT_VAL(value) PRINT_VAL_MSG(value,"")
+#define PRINT_VAL_MSG(value, message) cout << #value" : " << value <<", " message << endl;
 
 extern Display *xdisplay_;
 
@@ -19,8 +31,8 @@ GtkWidget* CreatePreservedChild();
 GtkWidget* CreateChild();
 GdkWindow* CreateRootWindow();
 
-int TestOpenDisplay();
-int test_main(int argc, char** argv);
+
+void drawPixmap(GdkDrawable* pixmap, const char* filename, bool draw_circle = false);
 
 static const char *event_names[] = {
    "",

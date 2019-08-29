@@ -27,6 +27,7 @@
 # include <sys/ipc.h>
 # include <sys/shm.h>
 # include <X11/extensions/XShm.h>
+#include  "../functions.h"
 
 #else /* !HAVE_XSHM_EXTENSION */
 
@@ -39,6 +40,8 @@ typedef struct {
 #define XShmSegmentInfo dummy_segment_info
 
 #endif
+
+
 
 extern XImage *create_xshm_image (Display *dpy, Visual *visual,
                                   unsigned int depth,
@@ -53,7 +56,5 @@ extern Bool get_xshm_image (Display *dpy, Drawable d, XImage *image,
                             XShmSegmentInfo *shm_info);
 extern void destroy_xshm_image (Display *dpy, XImage *image,
                                 XShmSegmentInfo *shm_info);
-
-
                             
 #endif /* __XSCREENSAVER_XSHM_H__ */

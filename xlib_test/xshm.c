@@ -108,8 +108,7 @@ static XImage *
 create_fallback (Display *dpy, Visual *visual,
                  unsigned int depth,
                  int format, XShmSegmentInfo *shm_info,
-                 unsigned int width, unsigned int height)
-{
+                 unsigned int width, unsigned int height) {
   XImage *image = XCreateImage (dpy, visual, depth, format, 0, NULL,
                                 width, height, BitmapPad(dpy), 0);
   shm_info->shmid = -1;
@@ -139,8 +138,7 @@ XImage *
 create_xshm_image (Display *dpy, Visual *visual,
 		   unsigned int depth,
 		   int format, XShmSegmentInfo *shm_info,
-		   unsigned int width, unsigned int height)
-{
+		   unsigned int width, unsigned int height) {
 #ifndef HAVE_XSHM_EXTENSION
 
   return create_fallback (dpy, visual, depth, format, shm_info, width, height);
@@ -149,11 +147,11 @@ create_xshm_image (Display *dpy, Visual *visual,
 
   Status status;
   XImage *image = 0;
-  if (!get_boolean_resource(dpy, "useSHM", "Boolean") ||
-      !XShmQueryExtension (dpy)) {
-    return create_fallback (dpy, visual, depth, format, shm_info,
-                            width, height);
-  }
+  // if (!get_boolean_resource(dpy, "useSHM", "Boolean") ||
+  //     !XShmQueryExtension (dpy)) {
+  //   return create_fallback (dpy, visual, depth, format, shm_info,
+  //                           width, height);
+  // }
 
   CATCH_X_ERROR(dpy);
   image = XShmCreateImage(dpy, visual, depth,
@@ -201,7 +199,7 @@ create_xshm_image (Display *dpy, Visual *visual,
       if (shm_got_x_error)
 	status = False;
 
-      if (!status)
+  if (!status)
 	{
 	  fprintf (stderr, "%s: XShmAttach failed!\n", progname);
 	  XDestroyImage (image);
@@ -341,3 +339,4 @@ destroy_xshm_image (Display *dpy, XImage *image, XShmSegmentInfo *shm_info)
 
 #endif /* HAVE_XSHM_EXTENSION */
 }
+
