@@ -18,6 +18,43 @@ void ChildWindowRealizeCallback(GtkWidget *window,
     XReparentWindow(xDisplay, GDK_WINDOW_XID(gtk_widget_get_window(window)), w, 400, 400);
 }
 
+void PaintChild(){
+
+
+}
+
+GdkDrawable* createPixmap(){
+    GdkVisual* sys_visual = gdk_visual_get_system();
+    // GdkDrawable* pixmap2 = gdk_pixmap_new(NULL,  pixmap_draw_rect.width(), pixmap_draw_rect.height(),  sys_visual->depth);
+    GdkColormap* c = gdk_colormap_new(gdk_visual_get_system(), FALSE);
+    // GdkPixbuf *ret = NULL;
+    // Drawable drawable = gdk_x11_drawable_get_xid(pixmap2);
+    Colormap cmap = gdk_x11_colormap_get_xcolormap(c);
+    Visual* visual = gdk_x11_visual_get_xvisual(sys_visual);
+
+ GdkDrawable* pixmap2 = gdk_pixmap_new(NULL,  400, 400,  sys_visual->depth);
+ Pixmap pixmap = gdk_x11_drawable_get_xid(pixmap2);
+//   Pixmap pixmap  = XCreatePixmap(d, DefaultScreen(d), 400, 400, sys_visual->depth);
+//    cairo_surface_t *surface 
+//                = cairo_xlib_surface_create(d, pixmap, visual, 400, 400);
+    cairo_t* dst = gdk_cairo_create(pixmap2);
+        //=  cairo_create(surface);
+    cairo_set_source_rgb(dst, 1.0, 1.0, 0.0);
+    cairo_set_operator (dst, CAIRO_OPERATOR_SOURCE);
+    cairo_rectangle(dst, 0, 0, 400, 400);
+    cairo_clip(dst);
+    cairo_paint(dst);
+
+    // cairo_destroy(dst);
+    gdk_pixbuf_xlib_init(d, 0);
+
+    GdkPixbuf * pixbuf = gdk_pixbuf_xlib_get_from_drawable(NULL,  pixmap,
+        cmap, visual, 0, 0, 0, 0, 400, 400);
+        gdk_pixbuf_save(pixbuf, "/code/tmppngs/windowless_paint.png",  "png",  NULL, "quality", "100", NULL);
+    
+    return pixmap2;
+}
+
 int TestOpenDisplay() {
    int s;
    XEvent e;
@@ -44,7 +81,7 @@ int TestOpenDisplay() {
         | SubstructureNotifyMask   // handle child window notifications (DestroyNotify)
         | StructureNotifyMask      // handle container notifications    (ConfigureNotify)
         | ExposureMask             // handle container redraw           (Expose)
-        ;
+        | VisibilityChangeMask ;
 
     attrs.do_not_propagate_mask = 0; // do not hide any events from child window
 
@@ -85,16 +122,16 @@ int TestOpenDisplay() {
 
 
   std::thread reparent_thread([&](){
-  //  std::this_thread::sleep_for(5s);
+    std::this_thread::sleep_for(5s);
     GtkWidget *window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
      gtk_window_set_default_size(GTK_WINDOW(window), 400, 400);
 
     // gtk_window_set_title (GTK_WINDOW (window), "Hello World");
-    GtkWidget * button = gtk_button_new_with_label("Button");
-    gtk_widget_show(button);
+//     GtkWidget * button = gtk_button_new_with_label("Button");
+//     gtk_widget_show(button);
+//     gtk_container_add(GTK_CONTAINER(window), button);
 
-    gtk_container_add(GTK_CONTAINER(window), button);
-
+   gtk_widget_set_app_paintable(window, TRUE);
     g_signal_connect(G_OBJECT(window), "realize",
           G_CALLBACK(ChildWindowRealizeCallback), (gpointer)(&w));
 
@@ -110,6 +147,13 @@ int TestOpenDisplay() {
     Atom wm_delete = XInternAtom(d, "WM_DELETE_WINDOW", True);
     // Subscribe WM_DELETE_WINDOW message
     XSetWMProtocols(d, w, &wm_delete, 1);
+
+    // XSelectInput(d, child_window, ExposureMask);
+
+    //GC xgc = XCreateGC();
+
+    GdkDrawable* pixmap = createPixmap();
+    GC gc;
 
     //     gtk_widget_show (button);
     
@@ -127,6 +171,9 @@ int TestOpenDisplay() {
             child_display = event.xmaprequest.display;
             child_window = event.xmaprequest.window;
 
+            PRINT_VAL(child_window);
+            PRINT_VAL(w);
+
             if (child_window) {
                 // Get container window attributes
                 XWindowAttributes attrs;
@@ -136,6 +183,14 @@ int TestOpenDisplay() {
                 XMoveResizeWindow(child_display,
                                   child_window,
                                   100, 100, attrs.width - 200, attrs.height - 200);
+                
+
+
+
+
+                XSelectInput(d, child_window, ExposureMask);
+
+
             }
         }
         // Propagate resize event to child window, and also resize it after MapRequest
@@ -149,13 +204,50 @@ int TestOpenDisplay() {
                 XMoveResizeWindow(child_display,
                                   child_window,
                                   100, 100, attrs.width - 200, attrs.height - 200);
+                gc = XCreateGC(d, child_window, 0, 0);
+                XSetBackground (d, gc, BlackPixel (child_display, DefaultScreen(d))); 
+
+                EnumerateWindows(d, w, 1, 1, NULL);
+
             }
+            
         }
 
         // Refresh container window
-        // else if (event.type == Expose) {
-        //     XClearWindow(d, w);
-        // }
+        else if (event.type == Expose) {
+            PRINT_VAL(event.xexpose.window);
+
+            if(event.xexpose.window == child_window) {
+                XDrawRectangle(d, child_window, gc, 100, 100, 200, 200);
+            }
+            // if(event.xexpose.window == child_window) {
+            //      cairo_surface_t *surface 
+            //      = cairo_xlib_surface_create(d, child_window, CopyFromParent, 400, 400);
+            //  cairo_t* dst =  cairo_create(surface);
+
+        
+            // cairo_t *src = gdk_cairo_create(pixmap);
+            // cairo_set_source_surface(dst, cairo_get_target(src), 0, 0);
+
+            // //cairo_set_source_rgb(dst, 1.0, 1.0, 0.0);
+            // cairo_set_operator (dst, CAIRO_OPERATOR_SOURCE);
+            // cairo_paint(dst);
+            // cairo_destroy(dst);
+            // //XSync(d, 0);
+            // }
+        }
+        else if (event.type == MapNotify) {
+            PRINT_VAL(event.xmap.window);
+
+            // if(event.xmap.window == child_window){
+            //     XClearWindow(child_display, child_window);   
+
+            // }
+            
+        }
+        else if (event.type == VisibilityNotify) {
+            PRINT_VAL(event.xvisibility.window);
+        }
 
         // Exit if child window was destroyed
         else if (event.type == DestroyNotify) {
@@ -178,3 +270,230 @@ int TestOpenDisplay() {
 
    return 0;
  }
+
+//  void clipWindow(Display display, Window win)
+//  {
+//     // Display dpy; //This is your display, we'll assume it is a valid Display
+//     // GC gc; //This is your GC, we'll assume it is a valid GC
+//     // XRectangle recs[1] = {XRectangle(20, 20, 100, 100) }; //This is an array containing the clipping regions you want.
+//     // int recs_n = 1; //This is the number of rectangles in the 'recs' array.
+
+//     // Pixmap bitmap = XCreateBitmap(display, DefaultScreen(display), 100, 100, 1);
+//     // GC gc=XCreateGC (dpy, clip_mask, 0, NULL);
+
+//     // XSetClipRectangles(display, gc, 0, 0, recs, recs_n, Unsorted); //Enable clipping
+//     // drawMyClippedGraphics(); //Call to whatever you want to use for drawing
+//     // XSetClipMask(dpy, gc, None); //Restore the GC
+//  }
+
+ void test_clip()
+ {
+  Display *dpy;
+  Window root;
+  XWindowAttributes wa;
+  GC g;
+  GC gc;
+
+  XColor redx, reds;
+
+  int x=10, y=10; 	/* position of the ball */
+  int dx=1, dy=1;	/* direction of the ball */
+
+  Pixmap double_buffer;
+  Pixmap clip_mask;
+
+
+  /* open the display (connect to the X server) */
+  dpy = XOpenDisplay (NULL);
+
+
+  /* get the root window */
+  root = DefaultRootWindow (dpy);
+
+
+  /* get attributes of the root window */
+  XGetWindowAttributes(dpy, root, &wa);
+
+
+  /* create a GC for drawing in the window */
+  g = XCreateGC (dpy, root, 0, NULL);
+
+
+  /* create the double buffer */
+  double_buffer = XCreatePixmap(dpy, root,
+                  wa.width, wa.height, wa.depth);
+  XSetForeground(dpy, g, BlackPixelOfScreen(DefaultScreenOfDisplay(dpy)));
+  XFillRectangle(dpy, double_buffer, g, 0, 0, wa.width, wa.height);
+  XCopyArea(dpy, double_buffer, root, g, 0, 0, wa.width, wa.height, 0, 0);
+
+
+  /* create the clipping mask */
+  clip_mask = XCreatePixmap(dpy, double_buffer, wa.width, wa.height, 1);
+  gc=XCreateGC (dpy, clip_mask, 0, NULL);
+
+
+  /* allocate the red color */
+  XAllocNamedColor(dpy,
+                     DefaultColormapOfScreen(DefaultScreenOfDisplay(dpy)),
+                     "red",
+                     &reds, &redx);
+
+
+  /* draw something */
+  while (1)
+    {
+      /* clear clipping mask */
+      XSetBackground(dpy, gc, 0);
+      XFillRectangle(dpy, clip_mask, gc, 0, 0, wa.width, wa.height);
+
+
+      /* remove the ball from the screen */
+      XSetForeground(dpy, g, BlackPixelOfScreen(DefaultScreenOfDisplay(dpy)));
+      XFillArc(dpy, double_buffer, g, x, y, 40, 40, 0, 360*64);
+
+
+      /* region changed, set mask */
+      XSetForeground(dpy, gc, 1);
+      XFillArc(dpy, clip_mask, gc, x, y, 40, 40, 0, 360*64);
+
+
+      /* change position */
+      x+=dx;
+      y+=dy;
+
+
+      /* draw in the new position */
+      XSetForeground(dpy, g, reds.pixel);
+      XFillArc(dpy, double_buffer, g, x, y, 40, 40, 0, 360*64);
+
+
+      /* region changed, set mask */
+      XSetForeground(dpy, gc, 1);
+      XFillArc(dpy, clip_mask, gc, x, y, 40, 40, 0, 360*64);
+
+
+      /* bounce (if the ball is at the edge of the screen) */
+      if( x<=0 || x>=wa.width-40 )
+        dx= -dx;
+      if( y<=0 || y>=wa.height-40 )
+        dy= -dy;
+
+
+      /* set clipping mask */
+      XSetClipMask(dpy, g, clip_mask);
+
+
+      /* copy the buffer to the window */
+      XCopyArea(dpy, double_buffer, root, g, 0, 0, wa.width, wa.height, 0, 0);
+
+
+      /* flush changes and sleep */
+      XFlush(dpy);
+      usleep (10);
+    }
+
+
+  XCloseDisplay (dpy);
+
+ }
+
+# define arrow_width 16
+# define arrow_height 16
+
+static unsigned char arrow_bits [ ] = {
+0x00 , 0x00 , 0x06 , 0x00 , 0x1e , 0x00 , 0x7c , 0x00 , 0xfc , 0x01 , 0xf8 , 0x07 ,
+0xf8 , 0x1f , 0xf8 , 0x7f , 0xf0 , 0x7f , 0xf0 , 0x03 , 0xe0 , 0x07 , 0xe0 , 0x06 ,
+0xc0 , 0x0c , 0xc0 , 0x18 , 0x80 , 0x30 , 0x00 , 0x00 } ;
+
+# define mask_width 16
+# define mask_height 16
+static unsigned char mask_bits [ ] = {
+0x07 , 0x00 , 0x1f , 0x00 , 0x7f ,0x00 , 0xf6 , 0x01 , 0xc6 , 0x07 , 0x8e , 0x1f,
+0x0c , 0x3e , 0x1c , 0xfc , 0x38 ,0xfc , 0x38 , 0xfc , 0x78 , 0x0f , 0xf0 , 0x1f ,
+0xf0 , 0x3f , 0xe0 , 0x7d , 0xe0 ,0x79 , 0xc0 , 0x71
+};
+
+int test_double_buffer_clip ()
+{
+  Display *mydisplay ;
+  Window baseWindow ;
+  XSetWindowAttributes myat ;
+  XSizeHints wmsize ;
+  XWMHints wmhints ;
+  XTextProperty windowName , iconName ;
+  XEvent baseEvent ;
+  XColor exact , closest;
+  GC mygc ;
+  XGCValues myGCValues ;
+  Pixmap pattern , mask ;
+  char *window_name = "Transparent" ;
+  char * icon_name = "Tr" ;
+  int screen_num , done ;
+  unsigned long mymask ;
+  int x, y;
+  
+  mydisplay = XOpenDisplay (NULL) ;
+  
+  screen_num = DefaultScreen ( mydisplay ) ;
+  myat.border_pixel = BlackPixel ( mydisplay , screen_num ) ;
+  XAllocNamedColor (mydisplay , XDefaultColormap ( mydisplay , screen_num ) ,
+                    "red" , &exact , &closest ) ;
+  
+  myat.background_pixel = closest.pixel;
+  myat.event_mask = ButtonPressMask | ExposureMask ;
+  mymask = CWBackPixel | CWBorderPixel | CWEventMask ;
+  baseWindow = XCreateWindow ( mydisplay , RootWindow ( mydisplay , screen_num ) ,
+          300 , 300 , 350 , 400 , 3 ,
+          DefaultDepth (mydisplay, screen_num), InputOutput ,
+          DefaultVisual(mydisplay, screen_num), mymask , &myat ) ;
+  
+  wmsize.flags = USPosition | USSize ;
+  XSetWMNormalHints ( mydisplay , baseWindow , &wmsize ) ;
+  wmhints.initial_state = NormalState ;
+  wmhints.flags = StateHint ;
+  XSetWMHints ( mydisplay , baseWindow , &wmhints ) ;
+  
+  XStringListToTextProperty (&window_name , 1 , &windowName ) ;
+  XSetWMName( mydisplay , baseWindow , &windowName ) ;
+  XStringListToTextProperty (&icon_name , 1 , &iconName ) ;
+  XSetWMIconName ( mydisplay , baseWindow , &iconName ) ;
+  
+  pattern = XCreatePixmapFromBitmapData ( mydisplay , baseWindow ,
+  (char *)arrow_bits , arrow_width , arrow_height ,
+  WhitePixel ( mydisplay , screen_num ) ,
+  BlackPixel ( mydisplay , screen_num ) ,
+  DefaultDepth ( mydisplay , screen_num ) ) ;
+  
+  mask = XCreatePixmapFromBitmapData ( mydisplay , baseWindow ,
+  (char *)mask_bits , mask_width , mask_height , 1 , 0 , 1 ) ;
+  mymask = GCForeground | GCBackground | GCClipMask ;
+  myGCValues.background = WhitePixel ( mydisplay , screen_num ) ;
+  myGCValues.foreground = BlackPixel ( mydisplay , screen_num ) ;
+  myGCValues.clip_mask = mask ;
+  mygc = XCreateGC ( mydisplay , baseWindow , mymask , &myGCValues ) ;
+  
+  XMapWindow( mydisplay , baseWindow ) ;
+  
+  done = 0 ;
+  while ( done == 0 ) {
+    XNextEvent ( mydisplay , &baseEvent ) ;
+    switch ( baseEvent.type ) {
+    case Expose :
+      break ;
+    case ButtonPress :
+      if ( baseEvent.xbutton.button == Button3 ) 
+      {
+          x = baseEvent.xbutton.x ;
+          y = baseEvent.xbutton.y ;
+          XSetClipOrigin( mydisplay , mygc , x , y ) ;
+          XCopyPlane ( mydisplay , pattern , baseWindow , mygc , 0 , 0 ,
+              arrow_width , arrow_height , x , y , 1 ) ;
+      }
+      break ;
+    }
+  }
+  
+  XUnmapWindow( mydisplay , baseWindow ) ;
+  XDestroyWindow ( mydisplay , baseWindow ) ;
+  XCloseDisplay ( mydisplay ) ;
+}

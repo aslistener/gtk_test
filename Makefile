@@ -5,31 +5,39 @@ includeflags=-I. -Ixlib_test
 
 atklflags=`pkg-config --libs atk`
 gtklflags=`pkg-config  --libs gtk+-2.0`
-x11lflags= -lX11 -lXext -lXt -ljpeg
+gdkpixbuflflags=`pkg-config --libs gdk-pixbuf-xlib-2.0`
+x11lflags= -lX11 -lXext -lXt -ljpeg -L. -Lxlib_test $(gdkpixbuflflags)
 
-#objects=main.o gtk_preserve_window.o functions.o
-sources= gtk_preserve_window.cc functions.cc \
-  gtk_plugin_container.cc xlib_container.cc xlib_test/xshm.c \
-	xlib_test/resources.c xlib_test/aligned_malloc.c xlib_test/thread_util.c bitmap_test.cc x11_test.cc   main.cc 
 
-objs = gtk_preserve_window.o functions.o \
-  gtk_plugin_container.o xlib_container.o xlib_test/xshm.o \
-	xlib_test/resources.o xlib_test/aligned_malloc.o xlib_test/thread_util.o bitmap_test.o x11_test.o  main.o
 
-cc = g++
+cpp_sources= $(wildcard *.cc xlib_test/*.cc)
+c_sources = $(wildcard *.c xlib_test/*.c)
 
-main:
-	$(cc) -g $(atkcflags) $(gtkcflags) $(sources) -o main \
+cpp_objs=$(patsubst %.cc,%.o,$(cpp_sources) )
+c_objs= $(patsubst %.c,%.o,$(c_sources) )
+
+objs   = $(patsubst %.cc,%.o,$(cpp_sources) )  $(patsubst %.c,%.o,$(c_sources) )
+
+CC = g++
+
+CFLAGS =  -g $(atkcflags) $(gtkcflags)
+CPPFLAGS =  -g $(atkcflags) $(gtkcflags)
+
+main: $(c_objs) $(cpp_objs)
+	$(CC) -g $(atkcflags) $(gtkcflags) -o main $(cpp_sources) $(c_sources)  \
 	  $(atklflags) $(gtklflags) $(x11lflags)
 
-# main:$(objs)
-# 	$(cc)  $(atklflags) $(gtklflags) $(x11lflags) $(objs) -o main
 
-# %.o: %.cc
-# 	$(cc) -g $(atkcflags) $(gtkcflags) -I. $% -o $@ $(atklflags) $(gtklflags) $(x11lflags)
+# main: $(c_objs) $(cpp_objs)
+# 	$(cc)  -g -o main $(c_objs) $(cpp_objs) \
+# 	  $(atklflags) $(gtklflags) $(x11lflags);
 
-# %.o: %.c
-# 	$(cc) -g $(atkcflags) $(gtkcflags) -I. $% -o $@ $(atklflags) $(gtklflags) $(x11lflags)
+# $(cpp_objs): $(cpp_sources)
+# 	$(cc) -g $(atkcflags) $(gtkcflags) -I. $< -o $@ $(atklflags) $(gtklflags) $(x11lflags)
+
+
+print:
+	@echo $(objs)
 
 clean:
 	rm -f *.o main

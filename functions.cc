@@ -273,6 +273,93 @@ void drawPixmap(GdkDrawable* pixmap, const char* filename, bool draw_circle){
   cairo_destroy(cairo);
 }
 
+void EnumerateWindows (Display *display, Window rootWindow,
+      int showErrors, int showStatus, std::vector<unsigned long>* windows)
+{
+  Window parent;
+  Window *children;
+  Window *child;
+  unsigned int noOfChildren;
+  int status;
+  int i;
+  
+  XTextProperty wmName;
+  char **list;
+//    wmName.value = new unsigned char[10];
+//    memcpy(wmName.value, "hello", 6);
+//    char winName[10] = {"hello"};
+//    status = XSetWMName (display, rootWindow, &wmName);
+  if(windows)  
+    windows->push_back(rootWindow);
+
+  status = XGetWMName (display, rootWindow, &wmName);
+  if ((status) && (wmName.value) && (wmName.nitems))
+  {
+     status = XmbTextPropertyToTextList (display, &wmName, &list, &i);
+     if ((status >= Success) && (i) && (*list))
+        printf ("INFO - Found window with name '%s' \r\n", (char*) strdup (*list));
+  }
+         
+  status = XQueryTree (display, rootWindow, &rootWindow, &parent, &children, &noOfChildren);
+   
+  if (status == 0)
+  {
+     if (showErrors)
+        printf ("ERROR - Could not query the window tree. Aborting.\r\n");
+     return;
+  }
+  
+  if (noOfChildren == 0)
+  {
+     if (showErrors)
+        printf ("ERROR - No children found. Aborting.\r\n");
+     return;
+  } 
+  else 
+  {
+     if (showStatus)
+        printf ("STATUS - %i number of child windows found.\r\n", noOfChildren);
+  }
+  
+  for (i=0; i < noOfChildren; i++)
+  {
+     EnumerateWindows (display, children[i], showErrors, showStatus, windows);
+  }
+  
+  XFree ((char*) children);  
+}
+
+// GET THE ACTUAL TEXT!!! - This is where it all comes unstuck
+void GetWindowProperties (Display *display, Window window)
+{
+   Atom *atoms;
+   int i, j;
+   Atom type;
+   int format, result, status;
+   unsigned long len, bytesLeft;
+   unsigned char *data;
+   char *atomName;
+   XTextProperty textData;
+   
+   atoms = XListProperties (display, window, &i);
+   if (i)
+   {
+      for (j=0; j < i; j++)
+      {
+         atomName = XGetAtomName(display, atoms[i]);
+       if (atomName)
+            printf ("Atom name: %s\r\n", atomName);
+          
+       status = XGetTextProperty (display, window, &textData, atoms[i]);
+       if (status)
+       {
+             printf ("Atom text: %s\r\n", textData.value);
+       }
+      }
+   }
+}
+// END GET THE ACTUAL TEXT!!! - This is where it all comes unstuck
+
 
 
 

@@ -1,17 +1,21 @@
 #include "functions.h"
 
 #include "bitmap_test.h"
+#include "gtk_window_test.h"
+#include "x11_test.h"
 
 int main(int argc, char ** argv)
 {
   gtk_init (&argc, &argv);
-  
-  test_bitmap();   
+//  test_window_repaint();
+  // test_bitmap();   
 
 //  TestPreserved();
 // CreateRootWindow();
 
- // TestOpenDisplay();
+testClip();
+
+//  TestOpenDisplay();
 
 
 //  gtk_main ();
