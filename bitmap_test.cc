@@ -427,3 +427,34 @@ void test_xshm(int shm_id) {
   }
 
 }
+
+#include <bitset>
+#define xlogo16_width 16
+#define xlogo16_height 16
+void test_mask()
+{
+
+  unsigned char xlogo16_bits[] = {
+     0x0f, 0x80, 0x1e, 0x80, 0x3c, 0x40, 0x78, 0x20, 0x78, 0x10, 0xf0, 0x08,
+     0xe0, 0x09, 0xc0, 0x05, 0xc0, 0x02, 0x40, 0x07, 0x20, 0x0f, 0x20, 0x1e,
+     0x10, 0x1e, 0x08, 0x3c, 0x04, 0x78, 0x02, 0xf0};
+
+    // auto printChar = [](char x){
+    //   cout << int(x & 0x80)
+    //   << (x & 0x40)
+    //   << (x & 0x20)
+    //   << (x & 0x10)
+    //   << (x & 0x08)
+    //   << (x & 0x04)
+    //   << (x & 0x02)
+    //   << (x & 0x01);
+    // };
+  for(int i = 0; i< 16; i+=2)
+  {
+    cout << bitset<8>(xlogo16_bits[i]) ;
+    cout << bitset<8>(xlogo16_bits[i+1]) <<endl;
+    // printChar(xlogo16_bits[i]);
+    // printChar(xlogo16_bits[i+1]);
+    //cout << endl;
+  }
+}

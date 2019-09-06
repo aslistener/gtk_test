@@ -14,6 +14,7 @@ int main(int argc, char ** argv)
 // CreateRootWindow();
 
 testClip();
+//  test_mask();
 
 //  TestOpenDisplay();
 

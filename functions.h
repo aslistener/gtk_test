@@ -12,6 +12,7 @@
 #include <cairo-xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
+#include <X11/extensions/shape.h>
 
 #include <jpeglib.h>
 #include <signal.h>

@@ -11,6 +11,8 @@ int save_ximage_pnm(XImage *img,char *pnmname,int type);
 // create a xbitmap, and paint with it
 void test_bitmap(); 
 
+void test_mask();
+
 
 // test for shared memory bitmap
 extern int x_shm_id;
