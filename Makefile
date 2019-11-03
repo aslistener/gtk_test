@@ -6,9 +6,7 @@ includeflags=-I. -Ixlib_test
 atklflags=`pkg-config --libs atk`
 gtklflags=`pkg-config  --libs gtk+-2.0`
 gdkpixbuflflags=`pkg-config --libs gdk-pixbuf-xlib-2.0`
-x11lflags= -lX11 -lXext -lXt -ljpeg -L. -Lxlib_test $(gdkpixbuflflags)
-
-
+x11lflags= -lX11 -lXext -lXt -ljpeg -L. -Lxlib_test $(gdkpixbuflflags) -lGL -lXi
 
 cpp_sources= $(wildcard *.cc xlib_test/*.cc)
 c_sources = $(wildcard *.c xlib_test/*.c)

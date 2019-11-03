@@ -13,8 +13,8 @@ int main(int argc, char ** argv)
 //  TestPreserved();
 // CreateRootWindow();
 
-testClip();
-//  test_mask();
+// test_gl_shaped_window(argc, argv);
+  testClip();
 
 //  TestOpenDisplay();
 

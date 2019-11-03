@@ -53,7 +53,7 @@ int test_main(int argc, char** argv) {
         | SubstructureNotifyMask   // handle child window notifications (DestroyNotify)
         | StructureNotifyMask      // handle container notifications    (ConfigureNotify)
         | ExposureMask             // handle container redraw           (Expose)
-        ;
+        | VisibilityChangeMask;
 
     attrs.do_not_propagate_mask = 0; // do not hide any events from child window
 

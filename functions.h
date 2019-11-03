@@ -17,6 +17,7 @@
 #include <jpeglib.h>
 #include <signal.h>
 
+#include <map>
 #include <assert.h>
 #include <chrono>
 #include <thread>
@@ -27,14 +28,27 @@ using namespace std;
 
 #define CAIRO_HAS_XLIB_SURFACE 1
 
+
+
+
+
 #define PRINT_VAL(value) PRINT_VAL_MSG(value,"")
-#define PRINT_VAL_MSG(value, message) cout <<__FUNCTION__ << "  " #value" : " << value <<", " << message << endl;
+#define PRINT_VAL_MSG(value, message) \
+cout << GetCurrentTime() <<__FUNCTION__ << "  " #value" : " << value <<", " << message << endl;
 
 extern Display *xdisplay_;
 
 GtkWidget* CreatePreservedChild();
 GtkWidget* CreateChild();
 GdkWindow* CreateRootWindow();
+
+const static std::string GetCurrentTime() {
+    std::time_t result = std::time(nullptr);
+    static char str_ret[50] = {0};
+    memset(str_ret, 0, 50);
+    std::strftime(str_ret, 49, "%T", std::localtime(&result));
+    return str_ret;
+}
 
 void EnumerateWindows (Display *display, Window rootWindow,
       int showErrors, int showStatus, std::vector<unsigned long>* windows);
