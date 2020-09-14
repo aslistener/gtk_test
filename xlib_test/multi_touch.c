@@ -635,7 +635,7 @@ static void init(struct multitouch *mt, Bool ownership)
     mt->needs_ownership = ownership;
 }
 
-int main(int argc, char **argv)
+int main_multitouch(int argc, char **argv)
 {
     int rc;
     struct multitouch mt;

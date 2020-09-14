@@ -36,7 +36,6 @@ using namespace std;
 #define PRINT_VAL_MSG(value, message) \
 cout << GetCurrentTime() <<__FUNCTION__ << "  " #value" : " << value <<", " << message << endl;
 
-extern Display *xdisplay_;
 
 GtkWidget* CreatePreservedChild();
 GtkWidget* CreateChild();
@@ -58,43 +57,9 @@ void GetWindowProperties (Display *display, Window window);
 
 void drawPixmap(GdkDrawable* pixmap, const char* filename, bool draw_circle = false);
 
-static const char *event_names[] = {
-   "",
-   "",
-   "KeyPress",
-   "KeyRelease",
-   "ButtonPress",
-   "ButtonRelease",
-   "MotionNotify",
-   "EnterNotify",
-   "LeaveNotify",
-   "FocusIn",
-   "FocusOut",
-   "KeymapNotify",
-   "Expose",
-   "GraphicsExpose",
-   "NoExpose",
-   "VisibilityNotify",
-   "CreateNotify",
-   "DestroyNotify",
-   "UnmapNotify",
-   "MapNotify",
-   "MapRequest",
-   "ReparentNotify",
-   "ConfigureNotify",
-   "ConfigureRequest",
-   "GravityNotify",
-   "ResizeRequest",
-   "CirculateNotify",
-   "CirculateRequest",
-   "PropertyNotify",
-   "SelectionClear",
-   "SelectionRequest",
-   "SelectionNotify",
-   "ColormapNotify",
-   "ClientMessage",
-   "MappingNotify"
-};
+extern Display *xdisplay_;
+
+extern const char *event_names[];
 
 
 //extern int TestMultiTouch(int argc, char **argv);
