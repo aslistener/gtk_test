@@ -4,7 +4,7 @@
 #include "gtk_window_test.h"
 #include "x11_test.h"
 
-int main(int argc, char ** argv)
+int mainxxxxx(int argc, char ** argv)
 {
   gtk_init (&argc, &argv);
 //  test_window_repaint();

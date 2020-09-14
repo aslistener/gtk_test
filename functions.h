@@ -96,3 +96,5 @@ static const char *event_names[] = {
    "MappingNotify"
 };
 
+
+//extern int TestMultiTouch(int argc, char **argv);
