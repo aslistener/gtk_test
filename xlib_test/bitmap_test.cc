@@ -351,7 +351,7 @@ void TestPaintSharedImageRealizeCallback(GtkWidget *window,
 
   bool draw_circle = true;
 
-//   drawPixmap(rootwindow_pixmap, "/code/tmppngs/rootwindow_pixmap.png", draw_circle);
+  // drawPixmap(rootwindow_pixmap, "/code/tmppngs/rootwindow_pixmap.png", draw_circle);
   // drawPixmap(window_pixmap, "/code/tmppngs/window_pixmap.png", draw_circle);
   // drawPixmap(image_pixmap, "/code/tmppngs/image_pixmap.png", draw_circle);
   // drawPixmap(drawing_area_pixmap, "/code/tmppngs/drawing_area_pixmap.png", draw_circle);
