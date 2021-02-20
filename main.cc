@@ -3,10 +3,15 @@
 #include "bitmap_test.h"
 #include "gtk_window_test.h"
 #include "x11_test.h"
+#include "mixed_oop/x11_objects_methods.h"
 
 int main(int argc, char ** argv)
 {
-  gtk_init (&argc, &argv);
+  testx11::testEvent();
+  return 0;
+
+}
+
 //  test_window_repaint();
   // test_bitmap();   
 
@@ -43,11 +48,9 @@ int main(int argc, char ** argv)
 // }
 
 // gtk_main ();
-return 0;
 
 //return TestOpenDisplay();
 //return test_main(argc, argv);
-}
 
 
 

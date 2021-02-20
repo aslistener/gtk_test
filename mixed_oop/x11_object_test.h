@@ -12,8 +12,8 @@ namespace testx11 {
     protected:
       void init();
       void queryShapeExtension();
-      void initSubGtkWindow();
-      void initX11SubWindow();
+      //void initSubGtkWindow();
+      //void initX11SubWindow();
 
       // x11 event callbacks
       virtual void HandleExposeEvent(const XEvent &event);
@@ -29,18 +29,11 @@ namespace testx11 {
       virtual void HandleMainWindowRealizeCallback(
           GtkWidget *window,
           gpointer data);
-      virtual void HandleButtonClickRealizeCallback(
-          GtkWidget *window,
-          GdkEvent  *event,
-          gpointer data);
 
       static void WindowRealizeCallback(GtkWidget *window, 
           gpointer data);
       static void ChildWindowRealizeCallback(GtkWidget *window, 
           gpointer data);
-      static void ClipButtonClickRealizeCallback(GtkWidget *window, 
-          GdkEvent  *event,
-          gpointer data);   
 
     protected:
       Display *display_ = 0;

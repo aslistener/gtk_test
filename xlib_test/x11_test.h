@@ -11,6 +11,3 @@ int test_double_buffer_clip ();
 int test_main(int argc, char** argv);
 
 int test_gl_shaped_window(int argc, char *argv[]);
-namespace testx11 {
-  void testClip();
-}

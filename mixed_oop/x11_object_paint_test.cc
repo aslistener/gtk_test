@@ -1,5 +1,5 @@
 #include "x11_object_test.h"
-#include "x11_test.h"
+#include "x11_objects_methods.h"
 
 namespace testx11 {
   class PaintX11Window:
