@@ -2,8 +2,8 @@
 #define GDK_PIXBUF_ENABLE_BACKEND
 
 
-#include "gtk_preserve_window.h"
-#include "gtk_plugin_container.h"
+#include "gtk_test/gtk_preserve_window.h"
+#include "gtk_test/gtk_plugin_container.h"
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <gdk/gdkx.h>

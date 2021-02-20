@@ -14,7 +14,7 @@ int main(int argc, char ** argv)
 // CreateRootWindow();
 
 // test_gl_shaped_window(argc, argv);
-  testClip();
+//  testx11::testClip();
 
 //  TestOpenDisplay();
 
