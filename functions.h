@@ -34,7 +34,8 @@ using namespace std;
 
 #define PRINT_VAL(value) PRINT_VAL_MSG(value,"")
 #define PRINT_VAL_MSG(value, message) \
-cout << GetCurrentTime() <<__FUNCTION__ << "  " #value" : " << value <<", " << message << endl;
+cout << GetCurrentTime() << "  " \
+     <<__FUNCTION__ << "  " #value" : " << value <<", " << message << endl;
 
 extern Display *xdisplay_;
 

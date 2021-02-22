@@ -14,6 +14,7 @@ class EventX11Window : public internal::CustomX11WindowBase {
   bool HandleEventInternal(const XEvent& event) override;
   void HandleChildWindowRealizeCallback(GtkWidget* window,
                                         gpointer data) override;
+  void HandleMainWindowRealizeCallback() override;
 
   // custom event                                    
   static void ClipButtonClickRealizeCallback(GtkWidget* window,
@@ -24,9 +25,22 @@ class EventX11Window : public internal::CustomX11WindowBase {
                                         gpointer data);
 
  private:
-  void initSubGtkWindow();
+  void InitDndProperty();
+//  void initSubGtkWindow();
   void initX11SubWindow();
 
- private:
+  bool HandleDndEvent(const XEvent& event);
+  bool HandleDndEnterEvent(const XClientMessageEvent& event);
+  bool HandleDndLeaveEvent(const XClientMessageEvent& event);
+  bool HandleDndPositionEvent(const XClientMessageEvent& event);
+  bool HandleDndStatusEvent(const XClientMessageEvent& event);
+  bool HandleDndFinishEvent(const XClientMessageEvent& event);
+  bool HandleDndDropEvent(const XClientMessageEvent& event);
+
+  void DrawDrag(const XPoint& p, Window w, bool is_drop);
+
+private:
+  XPoint cursor_point_;
+  XPoint window_point_;
 };
 }  // namespace testx11

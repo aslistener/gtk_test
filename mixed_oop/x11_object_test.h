@@ -26,9 +26,7 @@ namespace testx11 {
       virtual void HandleChildWindowRealizeCallback(
           GtkWidget *window,
           gpointer data);
-      virtual void HandleMainWindowRealizeCallback(
-          GtkWidget *window,
-          gpointer data);
+      virtual void HandleMainWindowRealizeCallback();
 
       static void WindowRealizeCallback(GtkWidget *window, 
           gpointer data);

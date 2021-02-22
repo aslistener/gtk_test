@@ -19,8 +19,9 @@ namespace testx11 {
         // PRINT_VAL(XConnectionNumber(xDisplay));
         // PRINT_VAL(GDK_WINDOW_XID(gtk_widget_get_window(window)));
         g_this->child_window_ = GDK_WINDOW_XID(gtk_widget_get_window(window));
-        g_this->child_display_ = 0;
-        XReparentWindow(g_this->display_, g_this->child_window_, g_this->window_, 400, 400);
+        g_this->child_display_ = xDisplay;
+        XReparentWindow(g_this->display_, g_this->child_window_, g_this->window_, 200, 200);
+        XSync(g_this->display_, 0);
       }
     }
   
@@ -36,6 +37,8 @@ namespace testx11 {
 
     void CustomX11WindowBase::init()
     {
+      XInitThreads();
+      gtk_init (NULL, NULL);
       display_ = XOpenDisplay(NULL);
       if(!display_) 
       {
@@ -175,9 +178,7 @@ namespace testx11 {
         GtkWidget *window,
         gpointer data) {}
     void CustomX11WindowBase::
-        HandleMainWindowRealizeCallback(
-        GtkWidget *window,
-        gpointer data){}
+        HandleMainWindowRealizeCallback(){}
   }  // namespace internal
 
   void TestObject(){
