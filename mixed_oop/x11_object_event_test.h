@@ -42,5 +42,6 @@ class EventX11Window : public internal::CustomX11WindowBase {
 private:
   XPoint cursor_point_;
   XPoint window_point_;
+  XPoint child_window_point_;
 };
 }  // namespace testx11

@@ -20,6 +20,7 @@ namespace testx11 {
     init();
     initX11SubWindow();
     InitDndProperty();
+    printf("window is %lx, child is %lx\n", window_, child_window_);
   }
 
   EventX11Window::~EventX11Window(){
@@ -129,16 +130,22 @@ namespace testx11 {
     Atom message_type = event.xclient.message_type;
     
     if(message_type == XInternAtom(display_, "XdndEnter", False)) {
+      printf("event:  %s, window: %lx\n", "XdndEnter", event.xclient.window);
       return HandleDndEnterEvent(event.xclient);
     } else if(message_type == XInternAtom(display_, "XdndLeave", False)) {
+      printf("event:  %s, window: %lx\n", "XdndLeave", event.xclient.window);
       return HandleDndLeaveEvent(event.xclient);
     } else if(message_type == XInternAtom(display_, "XdndPosition", False)) {
+      printf("event:  %s, window: %lx\n", "XdndPosition", event.xclient.window);
       return HandleDndPositionEvent(event.xclient);
     } else if(message_type == XInternAtom(display_, "XdndStatus", False)) {
+      printf("event:  %s, window: %lx\n", "XdndStatus", event.xclient.window);
       return HandleDndStatusEvent(event.xclient);
     } else if(message_type == XInternAtom(display_, "XdndFinished", False)) {
+      printf("event:  %s, window: %lx\n", "XdndFinished", event.xclient.window);
       return HandleDndFinishEvent(event.xclient);
     } else if(message_type == XInternAtom(display_, "XdndDrop", False)) {
+      printf("event:  %s, window: %lx\n", "XdndDrop", event.xclient.window);
       return HandleDndDropEvent(event.xclient);
     }
     return false;
@@ -146,17 +153,19 @@ namespace testx11 {
 
   bool EventX11Window::HandleDndEnterEvent(
       const XClientMessageEvent& event) {
-
+    int x, y;
+    Window child;
+    XWindowAttributes xwa;
     if(event.window == window_) {
-      int x, y;
-      Window child;
-      XWindowAttributes xwa;
       XTranslateCoordinates( display_, window_,
           DefaultRootWindow(display_), 0, 0, &x, &y, &child );
       window_point_.x = x;
       window_point_.y = y;
     } else if(event.window == child_window_) {
-
+      XTranslateCoordinates( display_, child_window_,
+          DefaultRootWindow(display_), 0, 0, &x, &y, &child );
+      child_window_point_.x = x;
+      child_window_point_.y = y;
     }
     return true;  
   }
@@ -168,31 +177,58 @@ namespace testx11 {
   bool EventX11Window::HandleDndPositionEvent(
       const XClientMessageEvent& event) {
 
-  unsigned long source_window = event.data.l[0];
-  int x_root_window = event.data.l[2] >> 16;
-  int y_root_window = event.data.l[2] & 0xffff;
-  cursor_point_.x = x_root_window - window_point_.x;
-  cursor_point_.y = y_root_window - window_point_.y;
+    unsigned long source_window = event.data.l[0];
+    int screen_x  = event.data.l[2] >> 16;
+    int screen_y = event.data.l[2] & 0xffff;
+  
+    bool in_dnd_position = true;
+    if(event.window == window_) {
+      cursor_point_.x = screen_x - window_point_.x;
+      cursor_point_.y = screen_y - window_point_.y;
+      if (screen_x >= child_window_point_.x &&
+          screen_y >= child_window_point_.y) {
+        in_dnd_position = false;
+      }
+  } else if(event.window == child_window_){
+    cursor_point_.x = screen_x - child_window_point_.x;
+    cursor_point_.y = screen_y - child_window_point_.y;
+    printf("DndPositionEvent on child, %u, %u\n",
+        cursor_point_.x, cursor_point_.y);
+  }
 
-  DrawDrag(cursor_point_, window_, false);
+  DrawDrag(cursor_point_, event.window, false);
 
   ::Time time_stamp = event.data.l[3];
   ::Atom suggested_action = event.data.l[4];
 
-    XEvent xev;
-    xev.xclient.type = ClientMessage;
-    xev.xclient.message_type =
-        XInternAtom(display_, "XdndStatus", False);
-    xev.xclient.format = 32;
-    xev.xclient.window = source_window;
+  XEvent xev;
+  xev.xclient.type = ClientMessage;
+  xev.xclient.message_type =
+      XInternAtom(display_, "XdndStatus", False);
+  xev.xclient.format = 32;
+  xev.xclient.window = source_window;
+  if(!in_dnd_position)
+    xev.xclient.data.l[0] = child_window_;
+  else
     xev.xclient.data.l[0] = window_;
-    xev.xclient.data.l[1] = (kWantFurtherPosEvents | kWillAcceptDrop);
-    // (drag_operation != 0) ?
-    //     (kWantFurtherPosEvents | kWillAcceptDrop) : 0;
-    xev.xclient.data.l[2] = 0;
-    xev.xclient.data.l[3] = 0;
-    xev.xclient.data.l[4] = suggested_action;
-    XSendEvent(display_, source_window, False, 0, &xev);
+  xev.xclient.data.l[1] = //(kWantFurtherPosEvents | kWillAcceptDrop);
+      in_dnd_position ?
+      (kWantFurtherPosEvents | kWillAcceptDrop) : 0;
+  xev.xclient.data.l[2] = 0;
+  xev.xclient.data.l[3] = 0;
+  xev.xclient.data.l[4] = suggested_action;
+  XSendEvent(display_, source_window, False, 0, &xev);
+
+    if(!in_dnd_position) {
+      XEvent xev;
+      xev.type = ClientMessage;
+      xev.xclient.message_type =
+          XInternAtom(display_, "XdndEnter", False);
+      xev.xclient.format = 32;
+      xev.xclient.window = child_window_;
+      xev.xclient.data.l[0] = source_window;
+      XSendEvent(display_, child_window_, False, 0, &xev);
+    }
     return true;  
   }
   bool EventX11Window::HandleDndStatusEvent(
@@ -206,7 +242,7 @@ namespace testx11 {
   bool EventX11Window::HandleDndDropEvent(
       const XClientMessageEvent& event) {
 
-    DrawDrag(cursor_point_, window_, true);
+    DrawDrag(cursor_point_, event.window, true);
     unsigned long source_window = event.data.l[0];
     
     XEvent xev;
@@ -215,7 +251,7 @@ namespace testx11 {
         XInternAtom(display_, "XdndFinished", False);
     xev.xclient.format = 32;
     xev.xclient.window = source_window;
-    xev.xclient.data.l[0] = window_;
+    xev.xclient.data.l[0] = event.window;
     xev.xclient.data.l[1] = 1;
     xev.xclient.data.l[2] = DragOperation::DRAG_COPY;
     XSendEvent(display_, source_window, False, 0, &xev);
