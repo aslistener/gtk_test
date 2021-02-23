@@ -431,8 +431,8 @@ int test_double_buffer_clip ()
   GC mygc ;
   XGCValues myGCValues ;
   Pixmap pattern , mask ;
-  char *window_name = "Transparent" ;
-  char * icon_name = "Tr" ;
+  const char *window_name = "Transparent" ;
+  const char * icon_name = "Tr" ;
   int screen_num , done ;
   unsigned long mymask ;
   int x, y;
@@ -458,9 +458,9 @@ int test_double_buffer_clip ()
   wmhints.flags = StateHint ;
   XSetWMHints ( mydisplay , baseWindow , &wmhints ) ;
   
-  XStringListToTextProperty (&window_name , 1 , &windowName ) ;
+  XStringListToTextProperty ((char **)&window_name , 1 , &windowName ) ;
   XSetWMName( mydisplay , baseWindow , &windowName ) ;
-  XStringListToTextProperty (&icon_name , 1 , &iconName ) ;
+  XStringListToTextProperty ((char **)&icon_name , 1 , &iconName ) ;
   XSetWMIconName ( mydisplay , baseWindow , &iconName ) ;
   
   pattern = XCreatePixmapFromBitmapData ( mydisplay , baseWindow ,

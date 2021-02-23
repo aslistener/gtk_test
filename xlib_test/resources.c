@@ -12,7 +12,7 @@
 #include "utils.h"
 #include "resources.h"
 
-extern char *progname;
+extern const char *progname;
 
 
 #if !defined(HAVE_COCOA) && !defined(HAVE_ANDROID)
@@ -24,7 +24,7 @@ extern char *progname;
    The Cocoa versions are on OSX/XScreenSaverView.m.
  */
 
-char *progclass = "main";
+const char *progclass = "main";
 // extern XrmDatabase XtDatabase (Display *);
 
 static unsigned int get_time_resource (Display *dpy, 

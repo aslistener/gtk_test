@@ -51,9 +51,9 @@
 # include <X11/Xmu/Error.h>
 #endif
 
-extern char *progname;
+extern const char *progname;
 
-char *progname = "mainexe";
+const char *progname = "mainexe";
 
 /* The documentation for the XSHM extension implies that if the server
    supports XSHM but is not the local machine, the XShm calls will return

@@ -26,8 +26,8 @@ namespace testx11 {
     }
   
     CustomX11WindowBase::CustomX11WindowBase()
-      :window_width_(999),
-      window_height_(999) {
+      :window_width_(600),
+      window_height_(600) {
     //  init();
     }
 
@@ -64,14 +64,15 @@ namespace testx11 {
           | ResizeRedirectMask
           | KeyPressMask
           | KeyReleaseMask
-          | FocusChangeMask;
+          | FocusChangeMask
+          | PointerMotionMask
+          | ButtonMotionMask;
       attrs.do_not_propagate_mask = 0; // do not hide any events from child window
       attrs.background_pixel = blue.pixel; // background color
       unsigned long attrs_mask
                               = CWEventMask  // enable attrs.event_mask
-                              | NoEventMask  // enable attrs.do_not_propagate_mask
                               | CWBackPixel  // enable attrs.background_pixel
-                          ;
+                          ;      // | NoEventMask  // enable attrs.do_not_propagate_mask
       window_=XCreateWindow(display_, RootWindow(display_, screen),
               100,100,window_width_, window_height_,
               1,CopyFromParent,InputOutput,CopyFromParent,
@@ -95,8 +96,9 @@ namespace testx11 {
       XSetWMProtocols(p_this->display_, p_this->window_, &wm_delete, 1);
       // XGrabServer(p_this->display_);
       
-      printf("display id: %xd, child display id: %xd\n",
-          p_this->display_, p_this->child_display_);
+      printf("display id: %lx, child display id: %lx\n",
+          (int64_t)(p_this->display_),
+           (int64_t)(p_this->child_display_));
 
       bool is_running = true;
       while(is_running) 
@@ -105,7 +107,12 @@ namespace testx11 {
         XGenericEventCookie *cookie = &event.xcookie;
         XClientMessageEvent &client_ev = event.xclient;
         XNextEvent(p_this->display_, &event);
-        PRINT_VAL(event.type);
+        // PRINT_VAL(event.type);
+        if(event.type != 6)
+          printf("%s   event.type is %d, event.window is %lx \n",
+              GetCurrentTime().data(), event.type, event.xany.window);
+
+
       // PRINT_VAL(event_names[event.type]);
       // PRINT_VAL(event.xmap.window);
         // Map child window when it requests and store its display and window id

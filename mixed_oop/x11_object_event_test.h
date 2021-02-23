@@ -37,11 +37,17 @@ class EventX11Window : public internal::CustomX11WindowBase {
   bool HandleDndFinishEvent(const XClientMessageEvent& event);
   bool HandleDndDropEvent(const XClientMessageEvent& event);
 
+  bool HandleChildMouseMove(const XEvent &xev);
+
   void DrawDrag(const XPoint& p, Window w, bool is_drop);
 
 private:
   XPoint cursor_point_;
   XPoint window_point_;
   XPoint child_window_point_;
+  bool is_in_child_area_ = false;
+  bool in_dnd_child_process = true;
+  bool is_in_dnd_drop_process_ = false;
+  ::Window source_window_ = 0;
 };
 }  // namespace testx11
